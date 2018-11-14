@@ -1,0 +1,11 @@
+---
+title: "CS5 Interim"
+author: "Yuanling Wang, Irina Cristali"
+date: "11/14/2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
