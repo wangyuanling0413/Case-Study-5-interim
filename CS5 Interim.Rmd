@@ -9,3 +9,52 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+cath = read.csv("dukecathr.csv")
+cath1a=subset(cath,cath$RSEQCATHNUM==1)
+
+library(mice)
+library(VIM)
+library(lattice)
+
+#cath time and demographics
+cath1a_agg1 = aggr(cath1a[,4:7],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,4:7]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#patient history 1
+cath1a_agg2 = aggr(cath1a[,8:12],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,8:12]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#patient history 2
+cath1a_agg3 = aggr(cath1a[,13:22],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,13:22]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#vital signs
+cath1a_agg4 = aggr(cath1a[,23:29],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,23:29]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#lab results prior to cath
+cath1a_agg5 = aggr(cath1a[,30:33],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,30:33]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#cath procedure
+cath1a_agg6 = aggr(cath1a[,34:36],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,34:36]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#cath results
+cath1a_agg7 = aggr(cath1a[,37:45],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,37:45]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#follow-up
+cath1a_agg8 = aggr(cath1a[,46:52],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,46:52]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+```
+
