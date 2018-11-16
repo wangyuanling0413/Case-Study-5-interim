@@ -69,9 +69,6 @@ library(VIM)
 library(lattice)
 ```
 
-
-\\\\\\\\
-
 We first try to get an overview of the missing data patterns in the form of the whole dataframe through $md.pattern$. The first row will tell us how many samples have complete information for all variables, whereas the following rows will tell us how many observations there are for each combinations of missing variables. 
 
 ```{r, echo = FALSE, include = FALSE}
