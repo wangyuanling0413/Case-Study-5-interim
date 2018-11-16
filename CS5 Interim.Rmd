@@ -50,16 +50,17 @@ apply(cath1a,2,pMiss)
 #apply(cath1a,1,pMiss)
 ```
 
+As we can see from the above results, the majority of the variables having missing values (17 out of 30) actually have a reasonably small percentage of missingness, that is, less than or equal to 10%. However, the rest of the variables (with the exception of 2 variables having 20% and 29% missing values), have incredibly high percentages of missingness, which are greater than 50%. This determines us to consider dropping these latter variables, as the highly confidential nature of our dataset would likely prevent us from obtaining further measurements. Indeed, as written in the description of the DUKECATHR dataset, the data were grouped by race, age, and year in which the cardiac catheterization procedure was performed, in order to remove individually identifiable information, which prevents obtaining more information for our purposes. Before we firmly decide whether to drop these columns with exceedingly high numbers of missing values, we will visually explore the patterns of missing data more in depth in the following section. 
 
 ## Visualizations of missing data
-We now proceed to examine the missing data pattern through data visualizations. To begin with, we group the variables by group considering the way they were collected; within each group, we look at the proportions and distributions of the missing data as well as the missing data pattern for different variables combined. The first three columns of the data on the catheterization identification are complete and were thus excluede from the visualization. 
+
+We now proceed to examine the missing data pattern through data visualizations. To begin with, we group the variables by group considering the way they were collected; within each group, we look at the proportions and distributions of the missing data as well as the missing data pattern for different variables combined. The first three columns of the data on the catheterization identification are complete and were thus excluded from the visualization. 
 
 ```{r, include=FALSE, echo = FALSE}
 library(mice)
 library(VIM)
 library(lattice)
 ```
-
 
 We first use the "md.pattern" function which gives us an overview of the missing data patterns in the form of a dataframe, that we can visualize separately. The first row will tell us how many samples have complete information for all variables, whereas the following rows will tell us how many observations there are for each combinations of missing variables. 
 
@@ -127,9 +128,14 @@ marginplot(cath1a[, c("SYSBP_R", "DIASBP_R")], col = mdc(1:2), cex.numbers = 1.2
 
 ## Data cleaning
 
-Due to..., we decided to delete the columns where more than a certain proportion of data is missing; the threshold was set to be 10%, mainly because... (literature review). 
+Having performed the analysis above, we now return back to our question introduced in the "Data Preprocessing" section, namely whether we should remove the variables that have a high percent (>20%) of missing values from our dataset. Indeed, due to the nature of our final research question---aiming to determine which factors are likely to cause death or survival following a catheterization procedure--- each physical and medical condition information related to an individual play an important role, so we shoudl strive to save as much data as possible. 
+
+However, we decide (with reservations) that the incredibly high percentages of missing values for some of the variables in the dataset, together with the plethora of combinations of missing variables for a single observation that we have investigated in the previous section, both represent a tremendous challenge in making reliable statistical investigations based on this dataset. In addition, the visual methods we have employed provided very little detail whether our missing data is MCAR (the best case scenario), MAR, or MNAR, preventing us to determine which course of action would be most appropriate with regards to the variables having a high missingness percentage. Due to these considerations, we decided to delete the columns where more than 20% of the data were missing, leaving us with columns having the more than reasonable level of 10% missing values. 
 
 ```{r, echo = FALSE, include = FALSE}
+
+## code for deletion given the given threshold set
+
 num_NA = rep(0,ncol(cath1a))
 
 for (i in 1:length(num_NA)){
@@ -143,6 +149,9 @@ index_propNAover = which(propNA_under10perc==FALSE)
 cath1a_2 = cath1a[,-index_propNAover]
 #research on people's common threshold
 ```
+
+
+Having considerably reduced our variables containing missing values, the next step is to finish cleaning up the data, by converting several variables taking numerical values to categorical ones, in order to match their discription in the DUKECATHR Dataset Dictionary. Moreover, having the right data type will also be essential in order to correctly implement a missing data imputation method, as we will see in the following section. As such, we convert numerous variables, including age, smoking status, race, catheterization procedure year, history of diabetes etc. to factors. The large number of categorical variables may also be due to the fact that some patients' credentials were grouped into broader categories in order to preserve anonimity.  
 
 ```{r, echo = FALSE, include = FALSE}
 cath1a_2$YRCATH_G = factor(cath1a_2$YRCATH_G)
@@ -171,6 +180,8 @@ cath1a_2$FUPROTCL = factor(cath1a_2$FUPROTCL)
 
 ## Little's test:
 
+Having cleaned up the data, and reduced it to variables having reasonable percentages of missing values, the next step is to (at least) test whether the data is Missing Completely at Random (MCAR), as our previous investigations failed to determine whether the data are MAR or MNAR. In order to accomplish this, we will use
+
 ```{r, echo = FALSE, include = FALSE}
 library(BaylorEdPsych)
 test = LittleMCAR(cath1a_2)
@@ -185,6 +196,7 @@ test$amount.missing
 ## Handling missing data through imputation
 
 For the remaining dataset, we performed Multiple Imputation using Chained Equations. 
+
 ```{r, echo = FALSE, include = FALSE}
 imp <- mice(cath1a_2, m=1, printFlag=FALSE, maxit = 1, seed=2525) 
 
