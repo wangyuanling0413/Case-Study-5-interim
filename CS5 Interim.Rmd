@@ -59,7 +59,7 @@ apply(cath1a,2,pMiss)
 
 #Visualizations of missing data
 =======
-## Visualizations of missing data
+## Visualizations of missing data 
 >>>>>>> 8f2da264ee1500f627ef8889b5cb56a0784dd91f
 We now proceed to examine the missing data pattern through data visualizations. To begin with, we group the variables by group considering the way they were collected; within each group, we look at the proportions and distributions of the missing data as well as the missing data pattern for different variables combined. The first three columns of the data on the catheterization identification are complete and were thus excluede from the visualization. 
 
@@ -70,13 +70,17 @@ library(lattice)
 ```
 
 
-We first use the "md.pattern" function which gives us an overview of the missing data patterns in the form of a dataframe, that we can visualize separately. The first row will tell us how many samples have complete information for all variables, whereas the following rows will tell us how many observations there are for each combinations of missing variables. 
+\\\\\\\\
+
+We first try to get an overview of the missing data patterns in the form of the whole dataframe through $md.pattern$. The first row will tell us how many samples have complete information for all variables, whereas the following rows will tell us how many observations there are for each combinations of missing variables. 
 
 ```{r, echo = FALSE, include = FALSE}
 #View(md.pattern(cath1a_2))
 ```
 
-However, due to the high dimensions of the dataframe resulting from the above step (186 rows and 39 columns), it may be more useful to assess missingness in the dataset graphically, using the "aggr()" function of the MICE package. 
+However, due to the high dimensions of the dataframe resulting from the above step (186 rows and 39 columns), the resulting plot could not convey useful information; we thus decided to group the variables and assess missingness in the dataset graphically, using the "aggr()" function.
+
+Specifically, we looked into the interpretation of each variable and considered the possibility of the correlation of missing data patterns among them. The data collected can be grouped by the catheterization identification and linking, demographics information, patient history, laboratory results prior to the catheterization, catheterization procedure, catheterization results and the follow-up information, assuming that the correlation of missing data pattern would be more correlated within each group (which makes intuitive sense because within each group the data are collected through similar means, and are thus more likely to have similar missing patterns). We then visualize the missing data by group, with variables within each group examined in a combined fashion. An example of the visualization of vital sign variables is presented below.
 
 ```{r, echo = FALSE, include = FALSE}
 #cath time and demographics
@@ -120,10 +124,14 @@ labels=names(cath1a[,46:52]),cex.axis=.7, gap=3,
 ylab=c("Proportion missing","Missingness Pattern"))
 ```
 
-From the visualization above, we notice that there are several pairs of variables whose missing data patterns suffer from the tendency of being correlated with each other. We decided to further look into each pair of them through margin plot so as to asses whether our data are missing completely at random, an essential assumption that will allow us to use the MICE method for imputation. 
-
---(select several pairs of the variables and do margin plot below:) This is how we will also asses whether our data are missing completely at random, an essential assumption that will allow us to use the MICE method for imputation. 
-
+```{r}
+#vital signs (demonstrated example)
+cath1a_agg4 = aggr(cath1a[,23:29],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,23:29]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+```
+ 
+From the visualization above, we notice that there are several pairs of variables whose missing data patterns suffer from the tendency of being correlated with each other. We decided to further look into each pair of them through margin plot so as to asses whether our data are missing completely at random, an essential assumption that will allow us to use the MICE method for imputation. An example of the margin plot of the variables $SYSBP_R$ and $WEIGHT_R$ is demonstrated as below. 
 
 ```{r, echo = FALSE, include = FALSE}
 marginplot(cath1a[, c("S3", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
@@ -132,6 +140,12 @@ marginplot(cath1a[, c("HEIGHT_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.
 marginplot(cath1a[, c("SYSBP_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
 marginplot(cath1a[, c("SYSBP_R", "DIASBP_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
 ```
+
+```{r}
+marginplot(cath1a[, c("SYSBP_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
+```
+ 
+From the boxplots specified above, we obseved that the red boxplots and the blue boxplots are approximately the same in most of the cases; we thus speculated that we might be able to treat the data as missing completely at random, yet more evidence is needed to support the assumption. 
 
 
 ## Data cleaning
