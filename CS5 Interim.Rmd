@@ -39,7 +39,7 @@ After this operation, we can now notice that the dimension of our data has decre
 
 We now investigate which variables in our dataset contain missing values, by firstly running a "summary" of our data, which currently contains a total of 52 columns. This command will indicate to us basic statistics for each variable, as well as whether NA's are present, which is a useful first to start investigating the "missingness" in our data. As we can see from the results, the variables containing missing values are RACE_G, CHFSEV, DPCABG, DPMI, DPPCI, HXANGINA, HXCHF, DIASBP_R, PULSE_R, SUSBP_R, CBRUITS, HEIGHT_R, S3, WEIGHT_R, CREATININE_R, HDL_R, LDL_R, TOTCHOL_R, CORDOM, GRAFTST, LADST, LCXST, LMST, LVEF_R, PRXLADST, RCAST, DSCABG, DSMI, DSPCI, DSSTROKE, for a total of 30 variables, more than half of all the variables in the dataset. 
 
-```{r}
+```{r, echo = FALSE, include = FALSE}
 summary(cath1a)
 ```
 
@@ -74,7 +74,7 @@ We first use the md.pattern function which gives us an overview of the missing d
 
 However, due to the high dimensions of the dqataframe resulting from the above step, it may be more useful to asses missingness in the dataset graphically, ussing the "aggr()" function of the MICE package. 
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, include = FALSE}
 #cath time and demographics
 cath1a_agg1 = aggr(cath1a[,4:7],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
 labels=names(cath1a[,4:7]),cex.axis=.7, gap=3, 
@@ -122,7 +122,7 @@ ylab=c("Proportion missing","Missingness Pattern"))
 
 RACE_G (1.9105837), CHFSEV (1.7213157), DPCABG (88.4162873), DPMI (50.2353062), DPPCI (96.6878101), HXANGINA ( 0.2046140), HXCHF (1.5269323), DIASBP_R (3.6881682 ), PULSE_R (0.8184562  ), SUSBP_R (3.2866131), CBRUITS (0.6649957), HEIGHT_R (1.8108343), S3 (0.4066704), WEIGHT_R (1.7187580 ), CREATININE_R (29.2367896), HDL_R ( 69.0725868), LDL_R (71.8272034 ), TOTCHOL_R (68.3103995), CORDOM (0.1048647), GRAFTST (91.2246151), LADST (8.4684639), LCXST (10.652718), LMST (5.9491534), LVEF_R (29.4797688), PRXLADST (8.4096373 ), RCAST (9.6987058), DSCABG (63.3178168), DSMI (87.3139291), DSPCI (49.2864085), DSSTROKE (89.1273211)
 
-```{r}
+```{r, echo = FALSE, include = FALSE}
 marginplot(cath1a[, c("S3", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
 marginplot(cath1a[, c("LCXST", "LMST")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
 marginplot(cath1a[, c("HEIGHT_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
@@ -130,8 +130,6 @@ marginplot(cath1a[, c("SYSBP_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2
 marginplot(cath1a[, c("SYSBP_R", "DIASBP_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
 ```
 
-
-``
 
 Due to..., we decided to delete the columns where more than a certain proportion of data is missing; the threshold was set to be 10%, mainly because... (literature review). 
 
@@ -152,7 +150,7 @@ cath1a_2 = cath1a[,-index_propNAover]
 
 #Little's test:
 
-```{r}
+```{r, echo = FALSE, include = FALSE}
 library(BaylorEdPsych)
 test = LittleMCAR(cath1a_2)
 test$df
@@ -165,7 +163,7 @@ test$amount.missing
 
 #Data cleaning
 
-```{r}
+```{r, echo = FALSE, include = FALSE}
 cath1a_2$YRCATH_G = factor(cath1a_2$YRCATH_G)
 cath1a_2$AGE_G = factor(cath1a_2$AGE_G)
 cath1a_2$RACE_G = factor(cath1a_2$RACE_G)
@@ -200,12 +198,12 @@ imp <- mice(cath1a_2, m=1, printFlag=FALSE, maxit = 1, seed=2525)
 
 ```
 
-```{r}
+```{r, echo = FALSE, include = FALSE}
 imp$method
 ```
 
 
-```{r}
+```{r, echo = FALSE}
 densityplot(imp)
 ```
 
@@ -213,7 +211,7 @@ densityplot(imp)
 xyplot(imp, PULSE_R  ~ RACE_G+CHFSEV+HXANGINA+HXCHF+DIASBP_R+SYSBP_R+CBRUITS+HEIGHT_R+S3+WEIGHT_R+CORDOM+LADST+LMST+PRXLADST+RCAST,pch=18,cex=1)
 ```
 
-```{r}
+```{r, echo = FALSE}
 xyplot(imp, HEIGHT_R  ~ RACE_G+CHFSEV+HXANGINA+HXCHF+DIASBP_R+SYSBP_R+CBRUITS+PULSE_R+S3+WEIGHT_R+CORDOM+LADST+LMST+PRXLADST+RCAST,pch=18,cex=1)
 ```
 
