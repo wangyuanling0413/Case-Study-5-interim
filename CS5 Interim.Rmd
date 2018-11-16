@@ -56,19 +56,11 @@ apply(cath1a,2,pMiss)
 
 As we can see from the above results, the majority of the variables having missing values (17 out of 30) actually have a reasonably small percentage of missingness, that is, less than or equal to 10%. However, the rest of the variables (with the exception of 2 variables having 20% and 29% missing values), have incredibly high percentages of missingness, which are greater than 50%. This determines us to consider dropping these latter variables, as the highly confidential nature of our dataset would likely prevent us from obtaining further measurements. Indeed, as written in the description of the DUKECATHR dataset, the data were grouped by race, age, and year in which the cardiac catheterization procedure was performed, in order to remove individually identifiable information, which prevents obtaining more information for our purposes. Before we firmly decide whether to drop these columns with exceedingly high numbers of missing values, we will visually explore the patterns of missing data more in depth in the following section. 
 
-<<<<<<< HEAD
+
 ## Visualizations of missing data
 
 We now proceed to examine the missing data pattern through data visualizations. To begin with, we group the variables by group considering the way they were collected; within each group, we look at the proportions and distributions of the missing data as well as the missing data pattern for different variables combined. The first three columns of the data on the catheterization identification are complete and were thus excluded from the visualization. 
-=======
-<<<<<<< HEAD
 
-#Visualizations of missing data
-=======
-## Visualizations of missing data 
->>>>>>> 8f2da264ee1500f627ef8889b5cb56a0784dd91f
-We now proceed to examine the missing data pattern through data visualizations. To begin with, we group the variables by group considering the way they were collected; within each group, we look at the proportions and distributions of the missing data as well as the missing data pattern for different variables combined. The first three columns of the data on the catheterization identification are complete and were thus excluede from the visualization. 
->>>>>>> 9b4b094ed1c0efbb1ab7527421a3a61d3520c169
 
 ```{r, include=FALSE, echo = FALSE}
 library(mice)
@@ -76,11 +68,11 @@ library(VIM)
 library(lattice)
 ```
 
-<<<<<<< HEAD
+
 We first use the "md.pattern" function which gives us an overview of the missing data patterns in the form of a dataframe, that we can visualize separately. The first row will tell us how many samples have complete information for all variables, whereas the following rows will tell us how many observations there are for each combinations of missing variables. 
-=======
+
 We first try to get an overview of the missing data patterns in the form of the whole dataframe through $md.pattern$. The first row will tell us how many samples have complete information for all variables, whereas the following rows will tell us how many observations there are for each combinations of missing variables. 
->>>>>>> 9b4b094ed1c0efbb1ab7527421a3a61d3520c169
+
 
 ```{r, echo = FALSE, include = FALSE}
 #View(md.pattern(cath1a_2))
@@ -210,7 +202,7 @@ cath1a_2$FUPROTCL = factor(cath1a_2$FUPROTCL)
 
 ## Little's test:
 
-Having cleaned up the data, and reduced it to variables having reasonable percentages of missing values, the next step is to (at least) test whether the data is Missing Completely at Random (MCAR), as our previous investigations failed to determine whether the data are MAR or MNAR. In order to accomplish this, we will use
+Having cleaned up the data, and reduced it to variables having reasonable percentages of missing values, the next step is to (at least) test whether the data is Missing Completely at Random (MCAR), as our previous investigations failed to determine whether the data are MAR or MNAR. In order to accomplish this, we will use Little's MCAR test, based on the "BaylorEdPsych" library, whose null hypothesis is that the data are missing completely at random. The p-value we obtain from this test is 0 (it is likely that the actual value was very close to zero and rounded off automatically), less than 0.05, we can conclude that our data are not missing completely at random. 
 
 ```{r, echo = FALSE, include = FALSE}
 library(BaylorEdPsych)
