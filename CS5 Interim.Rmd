@@ -239,4 +239,4 @@ xyplot(imp, HEIGHT_R  ~ RACE_G+CHFSEV+HXANGINA+HXCHF+DIASBP_R+SYSBP_R+CBRUITS+PU
 
 ## Potential Bias
 
-There are several ways in which 
+There are several ways in which the missing data can potentially bias the analysis results. Firstly, as we deleted the columns with more than 10 percent of data missing, we are losing valuable information, particularly patient's history and laboratory results before the tests. These missed variables can be of great importance when we perform survival analysis later on, because they are all related to the patient's health condition. What's more, when we performed multiple imputation of our remaining dataset, we assumed that our data is missing at random (although not completely) -- which was justified by the fact that we are only dealing with data missing less than 10 percent. However, such approximation has
