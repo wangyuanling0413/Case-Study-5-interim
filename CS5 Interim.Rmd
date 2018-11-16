@@ -35,7 +35,7 @@ nrow(cath1a)
 ```
 
 
-After this operation, we can now notice that the dimension of our data has decreased considerably to only 39098 rows. 
+After this operation, we notice that the dimension of our data has decreased considerably to only 39098 rows. 
 
 We now investigate which variables in our dataset contain missing values, by firstly running a "summary" of our data, which currently contains a total of 52 columns. This command will indicate to us basic statistics for each variable, as well as whether NA's are present, which is a useful first to start investigating the "missingness" in our data. As we can see from the results, the variables containing missing values are RACE_G, CHFSEV, DPCABG, DPMI, DPPCI, HXANGINA, HXCHF, DIASBP_R, PULSE_R, SUSBP_R, CBRUITS, HEIGHT_R, S3, WEIGHT_R, CREATININE_R, HDL_R, LDL_R, TOTCHOL_R, CORDOM, GRAFTST, LADST, LCXST, LMST, LVEF_R, PRXLADST, RCAST, DSCABG, DSMI, DSPCI, DSSTROKE, for a total of 30 variables, more than half of all the variables in the dataset. 
 
@@ -52,7 +52,6 @@ pMiss <- function(x){sum(is.na(x))/length(x)*100}
 apply(cath1a,2,pMiss)
 #apply(cath1a,1,pMiss)
 ```
-
 
 
 
