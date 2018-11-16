@@ -131,21 +131,13 @@ labels=names(cath1a[,23:29]),cex.axis=.7, gap=3,
 ylab=c("Proportion missing","Missingness Pattern"))
 ```
  
-From the visualization above, we notice that there are several pairs of variables whose missing data patterns suffer from the tendency of being correlated with each other. We decided to further look into each pair of them through margin plot so as to asses whether our data are missing completely at random, an essential assumption that will allow us to use the MICE method for imputation. An example of the margin plot of the variables $SYSBP_R$ and $WEIGHT_R$ is demonstrated as below. 
-
-```{r, echo = FALSE, include = FALSE}
-marginplot(cath1a[, c("S3", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
-marginplot(cath1a[, c("LCXST", "LMST")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
-marginplot(cath1a[, c("HEIGHT_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
-marginplot(cath1a[, c("SYSBP_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
-marginplot(cath1a[, c("SYSBP_R", "DIASBP_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
-```
+From the visualization above, we notice that there are several pairs of variables whose missing data patterns suffer from the tendency of being correlated with each other. We decided to further look into each pair of them through margin plot so as to asses whether our data are missing completely at random, an essential assumption for deciding whether we can use the MICE method for imputation. However, we were able to find a counterexample for the variables $SYSBP_R$ and $WEIGHT_R$, were the red boxplots and blue boxplots are not exactly that similar. 
 
 ```{r}
 marginplot(cath1a[, c("SYSBP_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
+
 ```
- 
-From the boxplots specified above, we obseved that the red boxplots and the blue boxplots are approximately the same in most of the cases; we thus speculated that we might be able to treat the data as missing completely at random, yet more evidence is needed to support the assumption. 
+This may suggest that the data may not be missing completely at random, yet more evidence is needed to support the assumption, which we will pursue in a later section using Little's Test. 
 
 
 ## Data cleaning
@@ -217,20 +209,17 @@ test$amount.missing
 
 ## Handling missing data through imputation
 
-<<<<<<< HEAD
-For the remaining dataset, we performed Multiple Imputation using Chained Equations. 
+Although the result if the previous section, namely that we failed to establish that the data was missing completely at random does not immediately indicate to us that we should use the MICE (Multiple Imputation using Chained Equations) method. Nonetheless, as we discussed in the data cleaning part, our current dataset only includes variables with less than 10 percent of data missing, so it would be reasonable to perform Multiple imputation so that we do not lose valuable data information due to the presence of an acceptable portion of missing values. 
+
+Through the utilization of MICE package, we managed to speficy the imputation model separately for each variable using the other variables as predictors; and set the number of imputed datasets to be 10, in order to limit 
 
 ```{r, echo = FALSE, include = FALSE}
-imp <- mice(cath1a_2, m=1, printFlag=FALSE, maxit = 1, seed=2525) 
-=======
-For the remaining dataset, we performed Multiple Imputation using Chained Equations to handle the missing data. Through the visualization of missing data patterns and the Little's test, we concluded that it would be safe to assume that our data missing mechanism is MCAR (missing completely at random). As we discussed in the data cleaning part, the remaining dataset we have only includes variables with less than 10 percent of data missing, so it would be reasonable to perform Multiple imputation so that we do not lose valuable data information due to the presence of an acceptable portion of missing values. 
-
-Through the utilization of MICE package, we managed to speficy the imputation model separately for each variable using the other variables as predictors; and we set the number of imputed datasets to be 10.
->>>>>>> a5f51257192e27092b6d9cb8e7c81bca0e41fc20
+imp <- mice(cath1a_2, m=5, printFlag=FALSE, maxit = 5, seed=2525) 
+```
 
 
 ```{r, echo = FALSE, include = FALSE}
-imp <- mice(cath1a_2, m=5, printFlag=FALSE, maxit = 1, seed=2525) 
+imp <- mice(cath1a_2, m=5, printFlag=FALSE, maxit = 5, seed=2525) 
 ```
 
 ```{r, echo = FALSE, include = FALSE}
