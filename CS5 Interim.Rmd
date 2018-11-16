@@ -128,21 +128,141 @@ marginplot(cath1a[, c("SYSBP_R", "DIASBP_R")], col = mdc(1:2), cex.numbers = 1.2
 
 
 ``
+#Data cleaning---
+title: "Case Study 5 Interim Report"
+author: "Yuanling Wang, Irina Cristali"
+date: "11/14/2018"
+output: pdf_document
+---
 
-#Little's test:
-(writeup)
-```{r}
-library(BaylorEdPsych)
-test = LittleMCAR(cath1a_2)
-test$df
-test$chi.square
-test$p.value
-test$missing.patterns
-test$amount.missing
+
+Interim report: Produce a 5 page (maximum) report in R markdown that explores the missing data patterns and mechanisms to the extent possible based on the data provided. Comment on the potential for missing data to bias analysis results.
+
+#Introduction
+This report aims to explore the missing data patterns and mechanisms of a dataset of cardiac catheterization procedures provided by The Duke Databank for Cardiovascular Disease (DDCD), a clinical care database created by Duke Department of Medicine from 1946 to 1967. The patterns of missing data would be closely examined through visualizations and statistical tests; approaches of handling the missing data including imputation and necessary deletion would follow. The potential for missing data to bias analysis results would also be discussed. 
+
+```{r, echo = FALSE, include = FALSE}
+library(mice)
+library(VIM)
+library(lattice)
+```
+
+#Data Preprocessing
+
+The dataset for analysis here is $DUKECATHR$, the version of $DUKECATH$ dataset for educational use. The dataset contains a subset of cardiac catheterization procedures conducted in adult patients at Duke University Medical Center between 1985 and 2013. The observed variables for each patient include catheterization identification and linking, demographics information, patient history, laboratory results prior to the catheterization, catheterization procedure, catheterization results and the follow-up information. 
+
+We start by reading in the data file which contains 83320 observations. As described in the "DUKECATHR" dataset documentation for users, each observation in the dataset corresponds to a certain catheterization procedure undergone by a patient at the Duke Hospital. However, as we have noted in class and read in the documentation, there are several different procedures that correspond to the same patient. Since the main goal of our investigation will be to determine which factors impact survival after the first catheterization, we will thus subset the data and only account for the first procedure, in the case of patients that have undergone multiple ones. 
+
+```{r, echo = FALSE, include = FALSE}
+dukecathr <- read.csv(file="dukecathr.csv", header=TRUE, sep=",")
+nrow(dukecathr)
+cath1a=subset(dukecathr, dukecathr$RSEQCATHNUM==1)
+#View(cath1a)
+```
+
+```{r, echo = FALSE, include = FALSE}
+nrow(cath1a)
 ```
 
 
-#Handling missing data
+After this operation, we can now notice that the dimension of our data has decreased considerably to only 39098 rows. 
+
+We now investigate which variables in our dataset contain missing values, by firstly running a "summary" of our data, which currently contains a total of 52 columns. This command will indicate to us basic statistics for each variable, as well as whether NA's are present, which is a useful first to start investigating the "missingness" in our data. As we can see from the results, the variables containing missing values are RACE_G, CHFSEV, DPCABG, DPMI, DPPCI, HXANGINA, HXCHF, DIASBP_R, PULSE_R, SUSBP_R, CBRUITS, HEIGHT_R, S3, WEIGHT_R, CREATININE_R, HDL_R, LDL_R, TOTCHOL_R, CORDOM, GRAFTST, LADST, LCXST, LMST, LVEF_R, PRXLADST, RCAST, DSCABG, DSMI, DSPCI, DSSTROKE, for a total of 30 variables, more than half of all the variables in the dataset. 
+
+```{r}
+summary(cath1a)
+```
+
+The natural question that follows is: for each of the above variables, what is the percentage of missing values? We investigate that and obtain the following missingness percentages for each variable that contains missing instances:
+
+RACE_G (1.9105837), CHFSEV (1.7213157), DPCABG (88.4162873), DPMI (50.2353062), DPPCI (96.6878101), HXANGINA ( 0.2046140), HXCHF (1.5269323), DIASBP_R (3.6881682 ), PULSE_R (0.8184562  ), SUSBP_R (3.2866131), CBRUITS (0.6649957), HEIGHT_R (1.8108343), S3 (0.4066704), WEIGHT_R (1.7187580 ), CREATININE_R (29.2367896), HDL_R ( 69.0725868), LDL_R (71.8272034 ), TOTCHOL_R (68.3103995), CORDOM (0.1048647), GRAFTST (91.2246151), LADST (8.4684639), LCXST (10.652718), LMST (5.9491534), LVEF_R (29.4797688), PRXLADST (8.4096373 ), RCAST (9.6987058), DSCABG (63.3178168), DSMI (87.3139291), DSPCI (49.2864085), DSSTROKE (89.1273211).
+
+```{r, echo = FALSE, include = FALSE}
+pMiss <- function(x){sum(is.na(x))/length(x)*100}
+apply(cath1a,2,pMiss)
+#apply(cath1a,1,pMiss)
+```
+
+
+
+
+#Visualizations of missing data
+We now proceed to examine the missing data pattern through data visualizations. To begin with, we group the variables by group considering the way they were collected; within each group, we look at the proportions and distributions of the missing data as well as the missing data pattern for different variables combined. The first three columns of the data on the catheterization identification are complete and were thus excluede from the visualization. 
+
+```{r, include=FALSE, echo = FALSE}
+library(mice)
+library(VIM)
+library(lattice)
+```
+
+
+We first use the md.pattern function which gives us an overview of the missing data patterns in the form of a dataframe, that we can visualize separately. The first row will tell us how many samples have complete information for all variables, whereas the following rows will tell us how many rows there are for each combinations of missing variables. 
+
+```{r, echo = FALSE, include = FALSE}
+#View(md.pattern(cath1a_2))
+```
+
+However, due to the high dimensions of the dqataframe resulting from the above step, it may be more useful to asses missingness in the dataset graphically, ussing the "aggr()" function of the MICE package. 
+
+```{r, echo = FALSE}
+#cath time and demographics
+cath1a_agg1 = aggr(cath1a[,4:7],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,4:7]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#patient history 1
+cath1a_agg2 = aggr(cath1a[,8:12],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,8:12]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#patient history 2
+cath1a_agg3 = aggr(cath1a[,13:22],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,13:22]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#vital signs
+cath1a_agg4 = aggr(cath1a[,23:29],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,23:29]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#lab results prior to cath
+cath1a_agg5 = aggr(cath1a[,30:33],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,30:33]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#cath procedure
+cath1a_agg6 = aggr(cath1a[,34:36],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,34:36]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#cath results
+cath1a_agg7 = aggr(cath1a[,37:45],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,37:45]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+
+#follow-up
+cath1a_agg8 = aggr(cath1a[,46:52],col=mdc(1:2),numbers=TRUE,sortVars=TRUE,
+labels=names(cath1a[,46:52]),cex.axis=.7, gap=3, 
+ylab=c("Proportion missing","Missingness Pattern"))
+```
+
+
+--(select several pairs of the variables and do margin plot below:) This is how we will also asses whether our data are missing completely at random, an essential assumption that will allow us to use the MICE method for imputation. 
+
+
+RACE_G (1.9105837), CHFSEV (1.7213157), DPCABG (88.4162873), DPMI (50.2353062), DPPCI (96.6878101), HXANGINA ( 0.2046140), HXCHF (1.5269323), DIASBP_R (3.6881682 ), PULSE_R (0.8184562  ), SUSBP_R (3.2866131), CBRUITS (0.6649957), HEIGHT_R (1.8108343), S3 (0.4066704), WEIGHT_R (1.7187580 ), CREATININE_R (29.2367896), HDL_R ( 69.0725868), LDL_R (71.8272034 ), TOTCHOL_R (68.3103995), CORDOM (0.1048647), GRAFTST (91.2246151), LADST (8.4684639), LCXST (10.652718), LMST (5.9491534), LVEF_R (29.4797688), PRXLADST (8.4096373 ), RCAST (9.6987058), DSCABG (63.3178168), DSMI (87.3139291), DSPCI (49.2864085), DSSTROKE (89.1273211)
+
+```{r}
+marginplot(cath1a[, c("S3", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
+marginplot(cath1a[, c("LCXST", "LMST")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
+marginplot(cath1a[, c("HEIGHT_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
+marginplot(cath1a[, c("SYSBP_R", "WEIGHT_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
+marginplot(cath1a[, c("SYSBP_R", "DIASBP_R")], col = mdc(1:2), cex.numbers = 1.2, pch = 19)
+```
+
+
+``
+
 Due to..., we decided to delete the columns where more than a certain proportion of data is missing; the threshold was set to be 10%, mainly because... (literature review). 
 
 ```{r, echo = FALSE, include = FALSE}
@@ -160,12 +280,60 @@ cath1a_2 = cath1a[,-index_propNAover]
 #research on people's common threshold
 ```
 
+#Little's test:
+
+```{r}
+library(BaylorEdPsych)
+test = LittleMCAR(cath1a_2)
+test$df
+test$chi.square
+test$p.value
+test$missing.patterns
+test$amount.missing
+```
+
+
+#Data cleaning
+
+```{r}
+cath1a_2$YRCATH_G = factor(cath1a_2$YRCATH_G)
+cath1a_2$AGE_G = factor(cath1a_2$AGE_G)
+cath1a_2$RACE_G = factor(cath1a_2$RACE_G)
+cath1a_2$ACS = factor(cath1a_2$ACS)
+cath1a_2$CHFSEV = factor(cath1a_2$CHFSEV)
+cath1a_2$HXANGINA = factor(cath1a_2$HXANGINA)
+cath1a_2$HXCEREB = factor(cath1a_2$HXCEREB)
+cath1a_2$HXCHF = factor(cath1a_2$HXCHF)
+cath1a_2$HXCOPD = factor(cath1a_2$HXCOPD)
+cath1a_2$HXDIAB = factor(cath1a_2$HXDIAB)
+cath1a_2$HXHTN = factor(cath1a_2$HXHTN)
+cath1a_2$HXHYL = factor(cath1a_2$HXHYL)
+cath1a_2$HXSMOKE = factor(cath1a_2$HXSMOKE)
+cath1a_2$S3 = factor(cath1a_2$S3)
+cath1a_2$CATHAPPR = factor(cath1a_2$CATHAPPR)
+cath1a_2$DIAGCATH = factor(cath1a_2$DIAGCATH)
+cath1a_2$INTVCATH = factor(cath1a_2$INTVCATH)
+cath1a_2$CORDOM = factor(cath1a_2$CORDOM)
+cath1a_2$NUMDZV = factor(cath1a_2$NUMDZV)
+cath1a_2$DEATH = factor(cath1a_2$DEATH)
+cath1a_2$FUPROTCL = factor(cath1a_2$FUPROTCL)
+```
+
+
+
+#Handling missing data
+
 
 For the remaining dataset, we performed Multiple Imputation using Chained Equations. 
 ```{r, echo = FALSE, include = FALSE}
 imp <- mice(cath1a_2, m=1, printFlag=FALSE, maxit = 1, seed=2525) 
 
 ```
+
+```{r}
+imp$method
+```
+
 
 ```{r}
 densityplot(imp)
@@ -179,3 +347,43 @@ xyplot(imp, PULSE_R  ~ RACE_G+CHFSEV+HXANGINA+HXCHF+DIASBP_R+SYSBP_R+CBRUITS+HEI
 xyplot(imp, HEIGHT_R  ~ RACE_G+CHFSEV+HXANGINA+HXCHF+DIASBP_R+SYSBP_R+CBRUITS+PULSE_R+S3+WEIGHT_R+CORDOM+LADST+LMST+PRXLADST+RCAST,pch=18,cex=1)
 ```
 
+
+
+```{r}
+cath1a_2$YRCATH_G = factor(cath1a_2$YRCATH_G)
+cath1a_2$AGE_G = factor(cath1a_2$AGE_G)
+cath1a_2$RACE_G = factor(cath1a_2$RACE_G)
+cath1a_2$ACS = factor(cath1a_2$ACS)
+cath1a_2$CHFSEV = factor(cath1a_2$CHFSEV)
+cath1a_2$HXANGINA = factor(cath1a_2$HXANGINA)
+cath1a_2$HXCEREB = factor(cath1a_2$HXCEREB)
+cath1a_2$HXCHF = factor(cath1a_2$HXCHF)
+cath1a_2$HXCOPD = factor(cath1a_2$HXCOPD)
+cath1a_2$HXDIAB = factor(cath1a_2$HXDIAB)
+cath1a_2$HXHTN = factor(cath1a_2$HXHTN)
+cath1a_2$HXHYL = factor(cath1a_2$HXHYL)
+cath1a_2$HXSMOKE = factor(cath1a_2$HXSMOKE)
+cath1a_2$S3 = factor(cath1a_2$S3)
+cath1a_2$CATHAPPR = factor(cath1a_2$CATHAPPR)
+cath1a_2$DIAGCATH = factor(cath1a_2$DIAGCATH)
+cath1a_2$INTVCATH = factor(cath1a_2$INTVCATH)
+cath1a_2$CORDOM = factor(cath1a_2$CORDOM)
+cath1a_2$NUMDZV = factor(cath1a_2$NUMDZV)
+cath1a_2$DEATH = factor(cath1a_2$DEATH)
+cath1a_2$FUPROTCL = factor(cath1a_2$FUPROTCL)
+```
+
+
+
+#Handling missing data
+
+
+For the remaining dataset, we performed Multiple Imputation using Chained Equations. 
+```{r, echo = FALSE, include = FALSE}
+imp <- mice(cath1a_2, m=1, printFlag=FALSE, maxit = 1, seed=2525) 
+
+```
+
+```{r}
+imp$method
+```
