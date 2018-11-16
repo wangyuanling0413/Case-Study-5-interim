@@ -209,18 +209,16 @@ test$amount.missing
 
 ## Handling missing data through imputation
 
-Although the result if the previous section, namely that we failed to establish that the data was missing completely at random does not immediately indicate to us that we should use the MICE (Multiple Imputation using Chained Equations) method. Nonetheless, as we discussed in the data cleaning part, our current dataset only includes variables with less than 10 percent of data missing, so it would be reasonable to perform Multiple imputation so that we do not lose valuable data information due to the presence of an acceptable portion of missing values. 
+Although the result if the previous section, namely that we failed to establish that the data was missing completely at random does not immediately indicate to us that we should use the MICE (Multiple Imputation using Chained Equations) method. Nonetheless, as we discussed in the data cleaning part, our current dataset only includes variables with less than 10 percent of data missing, so it would be reasonable to perform multiple imputation so that we do not lose valuable data information due to the presence of an acceptable portion of missing values. 
 
-Through the utilization of MICE package, we managed to speficy the imputation model separately for each variable using the other variables as predictors; and set the number of imputed datasets to be 10, in order to limit 
-
-```{r, echo = FALSE, include = FALSE}
-imp <- mice(cath1a_2, m=5, printFlag=FALSE, maxit = 5, seed=2525) 
-```
+In order to reduce the computation time, we set the number of chained iterations in the "mice()" function to be equal to 5 (a more reasonable value would have been 10, since that would match our percentage of missing values). 
 
 
 ```{r, echo = FALSE, include = FALSE}
 imp <- mice(cath1a_2, m=5, printFlag=FALSE, maxit = 5, seed=2525) 
 ```
+
+Furthermore, since we have changed the numerous variables to their (correct) categorical type in the data cleaning section, when checking the 
 
 ```{r, echo = FALSE, include = FALSE}
 imp$method
