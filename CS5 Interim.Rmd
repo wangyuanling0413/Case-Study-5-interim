@@ -218,16 +218,19 @@ In order to reduce the computation time, we set the number of chained iterations
 imp <- mice(cath1a_2, m=5, printFlag=FALSE, maxit = 5, seed=2525) 
 ```
 
-Furthermore, since we have changed the numerous variables to their (correct) categorical type in the data cleaning section, when checking the 
+Furthermore, since we have changed the numerous variables to their (correct) categorical type in the data cleaning section, when checking the imputation methods used within the MICE algorithm, we see that indeed, the continuous numerical variables were imputed using the predictive mean matching method, whereas the categorical or binary ones, were imputed using the "logreg" method. 
 
 ```{r, echo = FALSE, include = FALSE}
 imp$method
 ```
 
+The plot below shows the density of the imputed data for each variable (in red), together with the density of the observed data for each variable (in blue). We can not that, despite violating the asusmption of missing completely at random when deciding to use the MICE package, we obtain density plots of imputed values that approximately match those of the actual observed values. 
 
 ```{r, echo = FALSE}
 densityplot(imp)
 ```
+
+To further test whether our missing data imputation technique was appropriate, we consider a second visual -- two "xyplots", one for the distribution of the pulse rate plotted agains all the other imputed variables, and one for the height plotted against all the remaining variables. We chose pulse and height mainly because they are continuous variables, which would make sense to use in a cartesian plot (albeit some variables on the x-axis would still be categorical). In general, for both the plots above, we notice that the shape of the red points, namely the imputed values matches that of the blue ones, the observed, existing values, showing that our imputation method was, to a certain extent, successful. 
 
 ```{r, echo = FALSE}
 xyplot(imp, PULSE_R  ~ RACE_G+CHFSEV+HXANGINA+HXCHF+DIASBP_R+SYSBP_R+CBRUITS+HEIGHT_R+S3+WEIGHT_R+CORDOM+LADST+LMST+PRXLADST+RCAST,pch=18,cex=1)
