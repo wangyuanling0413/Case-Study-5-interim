@@ -204,10 +204,13 @@ test$amount.missing
 
 ## Handling missing data through imputation
 
-For the remaining dataset, we performed Multiple Imputation using Chained Equations. 
-```{r, echo = FALSE, include = FALSE}
-imp <- mice(cath1a_2, m=1, printFlag=FALSE, maxit = 1, seed=2525) 
+For the remaining dataset, we performed Multiple Imputation using Chained Equations to handle the missing data. Through the visualization of missing data patterns and the Little's test, we concluded that it would be safe to assume that our data missing mechanism is MCAR (missing completely at random). As we discussed in the data cleaning part, the remaining dataset we have only includes variables with less than 10 percent of data missing, so it would be reasonable to perform Multiple imputation so that we do not lose valuable data information due to the presence of an acceptable portion of missing values. 
 
+Through the utilization of MICE package, we managed to speficy the imputation model separately for each variable using the other variables as predictors; and we set the number of imputed datasets to be 10.
+
+
+```{r, echo = FALSE, include = FALSE}
+imp <- mice(cath1a_2, m=5, printFlag=FALSE, maxit = 1, seed=2525) 
 ```
 
 ```{r, echo = FALSE, include = FALSE}
